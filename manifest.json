@@ -1,0 +1,6 @@
+{
+  "domain": "huawei_hg659",
+  "name": "Huawei HG659 Router",
+  "documentation": "Integration of HG659 router. Device tracker and reboot action.",
+  "codeowners": ["@jpdecastro"]
+}
