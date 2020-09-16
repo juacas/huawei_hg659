@@ -68,8 +68,9 @@ class HuaweiH659DeviceScanner(DeviceScanner):
         self.last_results = active_clients
 
         _LOGGER.debug(
-            "Active clients: %s",
-            ", ".join(f"{client.mac} {client.name}" for client in active_clients),
+            "%s Active clients: %s",
+            len(active_clients),
+            ",".join(f"{client.mac} {client.name}" for client in active_clients),
         )
         return True
 

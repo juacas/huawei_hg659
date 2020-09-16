@@ -39,7 +39,7 @@ def setup(hass, config):
         return True
 
     hass.services.register(DOMAIN, "reboot", handle_reboot)
-    _LOGGER.debug(f"Register {DOMAIN} service 'reboot'")
+    _LOGGER.debug(f"Register {DOMAIN} service '{DOMAIN}.reboot'")
     # Return boolean to indicate that initialization was successfully.
     return True
 class huawei_hg659_client:
@@ -48,34 +48,32 @@ class huawei_hg659_client:
         self.host = config[CONF_HOST]
         self.username = config[CONF_USERNAME]
         self.password = config[CONF_PASSWORD]
-        # REBOOT THE ROUTER
 
+    # REBOOT THE ROUTER
     def reboot(self) -> bool:
         s = session()
-        if self.login(s) == False:
+        logindata = self.login(s)
+        if  logindata == False:
             return False
         # REBOOT REQUEST
-        _LOGGER.debug("Requesting reboot")
+        _LOGGER.info("Requesting reboot")
         try:
             data = {
-                'csrf': {'csrf_param': data['csrf_param'], 'csrf_token': data['csrf_token']}}
-            r = s.post('http://{0}/api/service/reboot.cgi'.format(IP_ADDR),
+                'csrf': {'csrf_param': logindata['csrf_param'], 'csrf_token': logindata['csrf_token']}}
+            r = s.post('http://{0}/api/service/reboot.cgi'.format(self.host),
                        data=json.dumps(data, separators=(',', ':')))
             data = json.loads(re.search('({.*?})', r.text).group(1))
             assert data['errcode'] == 0, data
             _LOGGER.info("Rebooting HG659")
             return True
         except Exception as e:
-            _LOGGER.error('Failed to reboot: {0}'.format(e))
+            _LOGGER.error('Failed to reboot: {0} with data {1}'.format(e, data))
             return False
 
     # LOGIN PROCEDURE
     def login(self, sess) -> bool:
         pass_hash = hashlib.sha256(self.password.encode()).hexdigest()
         pass_hash = base64.b64encode(pass_hash.encode()).decode()
-        _LOGGER.debug('Username {0} PassHash {1}'.format(
-            self.username, pass_hash))
-        _LOGGER.debug("Logging in")
         ## INITIAL CSRF ##
         try:
             r = sess.get('http://{0}'.format(self.host))
@@ -85,9 +83,8 @@ class huawei_hg659_client:
                 'csrf_token': html.find('meta', {'name': 'csrf_token'}).get('content'),
             }
             assert data['csrf_param'] and data['csrf_token'], 'Empty csrf_param or csrf_token'
-            _LOGGER.debug("Acquired CSRF")
         except Exception as e:
-            _LOGGER.error('Failed to get CSRF: {0}'.format(e))
+            _LOGGER.error('Failed to get CSRF. error "{0}" with data {1}'.format(e, data))
             return False
 
         ## LOGIN ##
@@ -97,15 +94,14 @@ class huawei_hg659_client:
             pass_hash = hashlib.sha256(pass_hash.encode()).hexdigest()
             data = {'csrf': {'csrf_param': data['csrf_param'], 'csrf_token': data['csrf_token']}, 'data': {
                 'UserName': self.username, 'Password': pass_hash}}
-            #_LOGGER.debug('Body: {0}'.format(json.dumps(data, separators=(',', ':'))))
             r = sess.post('http://{0}/api/system/user_login'.format(self.host),
                           data=json.dumps(data, separators=(',', ':')))
             data = json.loads(re.search('({.*?})', r.text).group(1))
             assert data.get('errorCategory', '').lower() == 'ok', data
-            _LOGGER.debug("Logged in")
-            return True
+            # _LOGGER.debug("Logged in")
+            return (data)
         except Exception as e:
-            _LOGGER.error('Failed to login: {0}'.format(e))
+            _LOGGER.error('Failed to login: {0} with data {1}'.format(e, data))
             return False
 
     def get_devices_response(self):
@@ -114,12 +110,12 @@ class huawei_hg659_client:
         if self.login(s) == False:
             return False
         # GET DEVICES RESPONSE
-        _LOGGER.debug("Requesting host info data")
         try:
-            rdev = s.get('http://{0}/api/system/HostInfo'.format(self.host))
+            query = 'http://{0}/api/system/HostInfo'.format(self.host)
+            rdev = s.get(query)
             devices_text = re.search('\/\*(.*?)\*\/', rdev.text).group(1)
             devices = json.loads(devices_text)
         except Exception as e:
-            _LOGGER.error('Failed to get Devices: {0}'.format(e))
+            _LOGGER.error('Failed to get Devices: {0} with query {1} rdev {2}'.format(e, query, rdev))
             return False
         return (devices)
