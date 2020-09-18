@@ -25,7 +25,7 @@ CONFIG_SCHEMA = vol.Schema({
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["sensor"]
+PLATFORMS = ["sensor", "device_tracker"]
 
 def setup(hass, config):
     """Set up is called when Home Assistant is loading our component."""
@@ -37,6 +37,8 @@ def setup(hass, config):
     hass.data[DOMAIN]['last_reboot'] = None
     hass.data[DOMAIN]['scanning'] = False
     hass.data[DOMAIN]['statusmsg'] = 'OK'
+    hass.data[DOMAIN]['status'] = 'on'
+
 
     def handle_reboot(call):
         """Handle the service call."""
@@ -68,6 +70,7 @@ class huawei_hg659_client:
         self.password = config[CONF_PASSWORD]
         self.session = None
         self.logindata = None
+        self.status = 'off'
 
     # REBOOT THE ROUTER
     def reboot(self) -> bool:
@@ -99,6 +102,7 @@ class huawei_hg659_client:
         try:
             self.session = session()
             r = self.session.get('http://{0}'.format(self.host))
+            self.status = 'on'
             html = BeautifulSoup(r.text, 'html.parser')
             data = {
                 'csrf_param': html.find('meta', {'name': 'csrf_param'}).get('content'),
@@ -108,6 +112,7 @@ class huawei_hg659_client:
         except Exception as e:
             _LOGGER.error('Failed to get CSRF. error "{0}" with data {1}'.format(e, data))
             self.statusmsg = e.errorCategory
+            self.status = 'off'
             return False
 
         ## LOGIN ##

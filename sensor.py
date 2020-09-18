@@ -27,11 +27,12 @@ class HG659Sensor(Entity):
         """Update the sensor."""
 
         # Check the data and update the value.
-        self._state = self.hass.data[DOMAIN].get("scanning", False)
+        self._state = self.hass.data[DOMAIN].get("client").status
 
         # Set/update attributes
         self._attr = {
             'last_reboot': self.hass.data[DOMAIN].get("last_reboot", None),
+            'scanning': self.hass.data[DOMAIN].get("scanning", False),
             'devices': self.hass.data[DOMAIN].get("devices", {}),
             'num_devices': len(self.hass.data[DOMAIN].get("devices", {})),
             'statusmsg' : self.hass.data[DOMAIN].get("client").statusmsg
