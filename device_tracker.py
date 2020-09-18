@@ -1,5 +1,5 @@
 """Support for HUAWEI routers."""
-from . import DOMAIN
+from .const import DOMAIN, DOMAIN_DATA, ICONS
 import voluptuous as vol
 import logging
 from collections import namedtuple
@@ -13,19 +13,12 @@ from homeassistant.helpers import config_validation as cv, entity_platform, serv
 
 _LOGGER = logging.getLogger(__name__)
 
-ICONS = {
-    'DesktopComputer': 'mdi:desktop-classic',
-    'laptop': 'mdi:laptop',
-    'smartphone': 'mdi:cellphone-wireless',
-    'game': 'mdi:gamepad-variant',
-    'stb': 'mdi:television',
-    'camera': 'mdi:cctv'
-}
 
 def get_scanner(hass, config):
     """Validate the configuration and return a HUAWEI scanner."""
-    config = hass.data[DOMAIN]
-    scanner = HuaweiH659DeviceScanner(config)
+    shared_data = hass.data[DOMAIN]
+    client = shared_data.get('client')
+    scanner = HuaweiH659DeviceScanner(hass, client)
     return scanner
 
 Device = namedtuple("Device", ["name", "ip", "mac", "state", "icon"])
@@ -33,18 +26,26 @@ Device = namedtuple("Device", ["name", "ip", "mac", "state", "icon"])
 class HuaweiH659DeviceScanner(DeviceScanner):
     """This class queries a router running HUAWEI HG659 firmware."""
 
-    def __init__(self, cli):
+    def __init__(self, hass, cli):
         """Initialize the scanner."""
-        # self.host = config[CONF_HOST]
-        # self.username = config[CONF_USERNAME]
-        # self.password = config[CONF_PASSWORD]
+        _LOGGER.info("HuaweiH659DeviceScanner initiated.")
         self.router_client = cli
+        self.hass = hass
         self.last_results = []
 
     def scan_devices(self):
         """Scan for new devices and return a list with found device IDs."""
-        self._update_info()
-        return [client.mac for client in self.last_results]
+        _LOGGER.debug("Scan_devices invoked.")
+        if self._update_info() == False:
+            # self.hass.data[DOMAIN]['devices'] = None
+            self.hass.data[DOMAIN]['scanning'] = False
+            _LOGGER.warning("Can't update device list")
+            return []
+        else:
+            clients = [client.mac for client in self.last_results]
+            self.hass.data[DOMAIN]['devices'] = clients
+            self.hass.data[DOMAIN]['scanning'] = True
+            return clients
 
     def get_device_name(self, device):
         """Return the name of the given device or None if we don't know."""
@@ -67,6 +68,7 @@ class HuaweiH659DeviceScanner(DeviceScanner):
         active_clients = [client for client in data if client.state]
         self.last_results = active_clients
 
+
         _LOGGER.debug(
             "%s Active clients: %s",
             len(active_clients),
@@ -80,6 +82,7 @@ class HuaweiH659DeviceScanner(DeviceScanner):
         Returns a list with all the devices known to the router DHCP server.
         """
         devices_json = self.router_client.get_devices_response()
+        self.hass.states.set(f"{DOMAIN}.scanning", devices_json != False)
         devices = []
         if devices_json != False:
             for device in devices_json:
@@ -93,4 +96,7 @@ class HuaweiH659DeviceScanner(DeviceScanner):
                 )
  #               _LOGGER.debug("Device: {0}".format(dev))
                 devices.append(dev)
-        return devices
+            return devices
+        else:
+
+            return []
