@@ -1,0 +1,4 @@
+{
+    "name": "Huawei HG659 Router Integration",
+    "domains": ["sensor","device_tracker"]
+}
