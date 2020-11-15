@@ -6,7 +6,6 @@ from collections import namedtuple
 
 from homeassistant.components.device_tracker import (
     SOURCE_TYPE_ROUTER,
-    PLATFORM_SCHEMA,
     DeviceScanner,
 )
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
@@ -15,13 +14,6 @@ from homeassistant.helpers import config_validation as cv, entity_platform, serv
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-    {
-        vol.Required(CONF_HOST): cv.string,
-        vol.Required(CONF_PASSWORD): cv.string,
-        vol.Required(CONF_USERNAME): cv.string,
-    }
-)
 
 def get_scanner(hass, config):
     """Validate the configuration and return a HUAWEI scanner."""
