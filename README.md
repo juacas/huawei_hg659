@@ -1,5 +1,5 @@
 # Huawei HG659 Router Integration in Home Assistant
-Component to integrate the Huawei HG659 router (tested on model HG659).
+Component to integrate the Huawei HG659 router (tested on model HG659). Also works on Eir F2000 router (an ISP branded HG659).
 
 ## Features
 - Publish the huawei_hg659.reboot service to reboot the router.
