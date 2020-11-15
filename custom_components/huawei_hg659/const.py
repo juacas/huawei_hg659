@@ -2,7 +2,7 @@
 # Base component constants
 DOMAIN = "huawei_hg659"
 DOMAIN_DATA = "{}_data".format(DOMAIN)
-VERSION = "0.4.1"
+VERSION = "0.5.0"
 PLATFORMS = ["sensor"]
 ISSUE_URL = "https://github.com/shanemeagher/huawei_hg659/issues"
 
