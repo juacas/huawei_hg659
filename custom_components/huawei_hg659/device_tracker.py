@@ -6,6 +6,7 @@ from collections import namedtuple
 
 from homeassistant.components.device_tracker import (
     DeviceScanner,
+    SOURCE_TYPE_ROUTER,
 )
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 import homeassistant.helpers.config_validation as cv
@@ -55,7 +56,9 @@ class HuaweiH659DeviceScanner(DeviceScanner):
             if client.mac == device:
                 return client.name
         return None
-
+    def source_type(self):
+        """Return the source type, eg gps or router, of the device."""
+        return SOURCE_TYPE_ROUTER
     def _update_info(self):
         """Ensure the information from the router is up to date.
 
