@@ -3,5 +3,5 @@
   "name": "Huawei HG659 Router",
   "documentation": "Integration of HG659 router. Device tracker and reboot action.",
   "codeowners": ["@juacas"],
-  "version": "v1.0.6"
+  "version": "v1.0.7"
 }
