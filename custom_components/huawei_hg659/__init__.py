@@ -81,7 +81,7 @@ class huawei_hg659_client:
         try:
             data = {
                 'csrf': {'csrf_param': self.logindata['csrf_param'], 'csrf_token': self.logindata['csrf_token']}}
-            r = s.post('http://{0}/api/service/reboot.cgi'.format(self.host),
+            r = self.session.post('http://{0}/api/service/reboot.cgi'.format(self.host),
                        data=json.dumps(data, separators=(',', ':')))
             data = json.loads(re.search('({.*?})', r.text).group(1))
             assert data['errcode'] == 0, data
