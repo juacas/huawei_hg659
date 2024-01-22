@@ -1,7 +1,8 @@
 {
   "domain": "huawei_hg659",
   "name": "Huawei HG659 Router",
-  "documentation": "Integration of HG659 router. Device tracker and reboot action.",
+  "documentation": "https://raw.githubusercontent.com/juacas/huawei_hg659/master/README.md",
+  "iot_class": "local_polling",
   "codeowners": ["@juacas"],
   "version": "v1.0.7"
 }
