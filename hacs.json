@@ -1,5 +1,5 @@
 {
   "name": "Huawei HG659 tracker",
   "render_readme": true,
-  "domains": ["device_tracker"]
+  "country": "ES"
 }
