@@ -1,8 +1,8 @@
 {
   "domain": "huawei_hg659",
   "name": "Huawei HG659 Router",
+  "codeowners": ["@juacas"],
   "documentation": "https://raw.githubusercontent.com/juacas/huawei_hg659/master/README.md",
   "iot_class": "local_polling",
-  "codeowners": ["@juacas"],
   "version": "v1.0.7"
 }
