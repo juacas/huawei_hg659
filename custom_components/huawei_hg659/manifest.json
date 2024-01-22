@@ -1,5 +1,5 @@
 {
-  "domain": "huawei_meshrouter",
+  "domain": "huawei_hg659",
   "name": "Huawei HG659 Router",
   "codeowners": ["@juacas"],
   "documentation": "https://raw.githubusercontent.com/juacas/huawei_hg659/master/README.md",
