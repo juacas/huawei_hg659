@@ -1,0 +1,9 @@
+{
+    "title": "Huawei HG659 tracker",
+    "services": {
+        "reboot": {
+            "name": "Reboot",
+            "description": "Not implemented yet!!! Will reboot the Huawei HG659 router."
+        }
+    }
+}
